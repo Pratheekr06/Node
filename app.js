@@ -17,7 +17,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('*', (req, res) => {
     res.status(404);
-    res.sendFile(path.join(__dirname, 'views', '404.html'));
+    res.render('404', {pageTitle:'404'});
 });
 
 app.listen(3000, () => {
