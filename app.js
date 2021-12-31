@@ -4,6 +4,9 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
 
+app.set('view engine', 'ejs');
+app.set('views', 'views');
+
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 
@@ -15,7 +18,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('*', (req, res) => {
     res.status(404);
-    res.sendFile(path.join(__dirname, 'views', '404.html'));
+    res.render('404', {pageTitle:'Page Not Found'});
 });
 
 app.listen(3000, () => {
