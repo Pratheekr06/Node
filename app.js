@@ -18,6 +18,7 @@ app.use(shopRoutes);
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('*', errorController.get404);
+app.post('*', errorController.get404);
 
 app.listen(3000, () => {
     console.log('Server started');
