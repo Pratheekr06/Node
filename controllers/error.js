@@ -1,4 +1,4 @@
-const path = require("path/posix");
+const path = require("path");
 
 exports.get404 = (req, res) => {
     res.status(404);
