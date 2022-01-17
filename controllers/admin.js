@@ -30,14 +30,16 @@ exports.postEditProduct = (req, res, next) => {
     const price = req.body.price;
     const description = req.body.description;
     const product = new Product(id,title,imageUrl,price,description);
-    product.save();
-    res.redirect('/')
+    product.save().then(() => res.redirect('/')).catch(err => console.log(err));
+    
 }
 
 exports.getProducts = (req, res, next) => {
-    Product.fetchAll(products => {
-        res.render('admin/products', {prods: products, pageTitle: 'Admin Product', path: '/admin/products'});
-    })
+    Product.fetchAll()
+        .then(([rows, fieldData]) => {
+            res.render('admin/products', {prods: rows, pageTitle: 'Admin Product', path: '/admin/products'});
+        })
+        .catch(err => console.log(err))
 };
 
 exports.postDeleteProduct = (req, res, next) => {
