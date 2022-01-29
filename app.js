@@ -11,7 +11,21 @@ const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 const errorController = require('./controllers/error');
 
+const User = require('./models/user');
+
+const db = require('./util/database');
+
 app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(async (req, res, next) => {
+    try {
+        const user = await User.findbyId('61f264bf1b386f15b17d352d');
+        if (user) req.user = new User(user.name, user.email, user.cart, user._id);
+        next();
+    } catch(err) {
+        console.error(err);
+    }
+})
 
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
@@ -20,6 +34,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('*', errorController.get404);
 app.post('*', errorController.get404);
 
-app.listen(3000, () => {
-    console.log('Server started');
-});
+db.mongoConnect(() => {
+    app.listen(3000, () => {
+        console.log('Server started');
+    });
+})
