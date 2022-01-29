@@ -26,4 +26,22 @@
     padding: 0.5rem;
     border: 1px solid #00695c;
     color: #00695c;
+    display: flex;
+}
+
+.orders__products-item img {
+    height: 10em;
+}
+
+.orders__products-item div {
+    width: 50%;
+}
+
+.orders__products-item div:nth-child(2) {
+    display: grid;
+    justify-content: end;
+}
+
+.orders__products-item div:nth-child(2) p {
+    margin: 0;
 }
