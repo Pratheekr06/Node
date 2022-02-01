@@ -13,15 +13,15 @@
                         <li class="orders__item">
                             <h1>Order - # <%= order._id %></h1>
                             <ul class="orders__products">
-                                <% order.items.forEach(product => { %>
+                                <% order.products.forEach(product => { %>
                                     <li class="orders__products-item">
                                         <div>
-                                            <p><%= product.title %> (Quantity: <%= product.quantity %>)</p>
-                                            <h4>Total Price: <%= product.price * product.quantity %></h4>
+                                            <p><%= product.productDetails.title %> (Quantity: <%= product.quantity %>)</p>
+                                            <h4>Total Price: <%= product.productDetails.price * product.quantity %></h4>
                                         </div>
                                         <div>
-                                            <img src="<%= product.imageUrl %>" alt="img">
-                                            <p><%= product.description %></p>
+                                            <img src="<%= product.productDetails.imageUrl %>" alt="img">
+                                            <p><%= product.productDetails.description %></p>
                                         </div>
                                     </li>
                                 <% }); %>
