@@ -1,0 +1,44 @@
+Schema Options
+    Capped(fixed size collections): new Schema({..}, { capped: 1024 });
+                                    new Schema({..}, { capped: { size: 1024, max: 1000 } });
+    minimize: Mongoose will, by default, "minimize" schemas by removing empty objects
+    toObject & toJSON & virtual: productSchema.path('title').get(function(v) {
+                                    return v + 'is title';
+                                });
+                                productSchema.set('toObject', { getters: true })
+                                productSchema.virtual('tp').get(function() {
+                                    return this.title + this.price;
+                                })
+    collation(diacritics):  find.collation({ locale: 'en_US', caseLevel: true })
+                            find.collation({ locale: 'en_US', numericOrdering: true })
+    set and get: new Schema({email: { type: String, set: toLower } })
+                 function hideCard (cc) {
+                    return '****-****-****-' + cc.slice(cc.length-4, cc.length);
+                 }
+                 var AccountSchema = new Schema({
+                    creditCardNumber: { type: String, get: hideCard }
+                 });
+    Subdocuments vs NestedPaths: instances of Nested never have child === undefined
+                                 instances of Subdoc can have child === undefined
+    Validation: {
+                    type: Number,
+                    min: [6, 'Must be at least 6, got {VALUE}']
+                }
+                {
+                    type: String,
+                    enum: {
+                        values: ['Coffee', 'Tea'],
+                        message: '{VALUE} is not supported'
+                    }
+                }
+                 manually run validation using doc.validate(callback) or doc.validateSync();
+                 err = doc.validateSync() -> err.errors['name].path/.value/.message
+                 update validators: updateOne({}, { color: 'not a color' }, { runValidators: true }} /default false
+                                    update validators 'this' is undefined
+                                    use context option: { runValidators: true, context: 'query' }
+Aggregate: Aggregation operations process multiple documents and return computed results
+           $match $group $sum $sort $avg etc
+Middleware:
+    pre and post: productSchema.post('save', function(doc) {
+                    console.log(doc);
+                  })

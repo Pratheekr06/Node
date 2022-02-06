@@ -1,36 +1,64 @@
 const path = require('path');
+require("dotenv").config();
 
 const express = require('express');
 const bodyParser = require('body-parser');
+const session = require('express-session');
+const MongoDbStore = require('connect-mongodb-session')(session);
+
 const app = express();
+const store = new MongoDbStore({
+    uri: process.env.URI,
+    collection: 'sessions',
+    expires: 1000 * 60 * 60 * 24 * 0.5
+})
 
 const mongoose = require('mongoose');
-require("dotenv").config();
 
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
+const authRoutes = require('./routes/auth');
 const errorController = require('./controllers/error');
 
 const User = require('./models/user');
 
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(session({ secret: 'mySecret', saveUninitialized: false, resave: false, store: store}));
 
 app.use(async (req, res, next) => {
-    try {
-        const user = await User.findById('61f95dab55519dc213e5d3df');
-        if (user) req.user = user;
+    if (req.session && req.session.isAuthenticated && req.session.userId) {
+        try {
+            const user = await User.findById(req.session.userId);
+            if (user) req.user = user;
+            next();
+        } catch(err) {
+            console.error(err);
+        }
+    } else {
         next();
-    } catch(err) {
-        console.error(err);
     }
-})
+});
+
+// app.use((req, res, next) => {
+//     try {
+//         const cookies = req.get('Cookie').split(';');
+//         res.locals.isAuthenticated = false;
+//         if (cookies.includes(' isAuthenticated=true')) {
+//             res.locals.isAuthenticated = true;
+//         }
+//         next();
+//     } catch(err) {
+//         console.error(err);
+//     }
+// });
 
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(authRoutes);
 
 app.use('*', errorController.get404);
 
