@@ -10,7 +10,10 @@ exports.postLogin = async (req, res, next) => {
         if (user) {
             req.session.userId = user._id;
             req.session.isAuthenticated = true;
-            req.session.save().then(() => res.redirect('/')).catch(err => console.error(err))
+            req.session.save(err => {
+                console.log(err);
+                res.redirect('/');
+            });
         }
     } catch(err) {
         console.error(err);
