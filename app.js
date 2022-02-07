@@ -10,7 +10,7 @@ const app = express();
 const store = new MongoDbStore({
     uri: process.env.URI,
     collection: 'sessions',
-    expires: 1000 * 60 * 60 * 24 * 0.5
+    expires: 1000 * 60 * 60 * 12
 })
 
 const mongoose = require('mongoose');
