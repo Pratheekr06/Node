@@ -18,6 +18,22 @@ const productSchema = new Schema({
         type: String,
         required: true,
     },
-});
+},
+    {
+        timestamps: true,
+    },
+);
+
+// productSchema.path('title').get(function(v) {
+//     return v + 'is title';
+// });
+// productSchema.set('toObject', { getters: true })
+// productSchema.virtual('tp').get(function() {
+//     return this.title + this.price;
+// })
+
+// productSchema.post('save', function(doc) {
+//     console.log(doc);
+// })
 
 module.exports = mongoose.model('Product', productSchema);
