@@ -5,6 +5,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const MongoDbStore = require('connect-mongodb-session')(session);
+const csrf = require('csurf');
+const flash = require('connect-flash');
 
 const app = express();
 const store = new MongoDbStore({
@@ -12,6 +14,7 @@ const store = new MongoDbStore({
     collection: 'sessions',
     expires: 1000 * 60 * 60 * 12
 })
+const csrfProtection = csrf();
 
 const mongoose = require('mongoose');
 
@@ -43,6 +46,15 @@ app.use(async (req, res, next) => {
     }
 });
 
+app.use(csrfProtection);
+
+app.use((req, res, next) => {
+    res.locals.isAuthenticated = req.session.isAuthenticated;
+    res.locals.csrfToken = req.csrfToken();
+    next();
+})
+app.use(flash());
+
 // app.use((req, res, next) => {
 //     try {
 //         const cookies = req.get('Cookie').split(';');
@@ -68,12 +80,6 @@ mongoose.connect(dbUrI);
 const connection = mongoose.connection;
 connection.once("open", async () => {
     console.log("Database connection established successfully");
-    // const user = User({
-    //     name: 'Test',
-    //     email: 'test@test.com',
-    //     cart: [],
-    // });
-    // await user.save();
     app.listen(3000, () => {
         console.log('Server started');
     });

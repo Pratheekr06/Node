@@ -4,7 +4,7 @@ const Order = require('../models/order');
 exports.getProducts = async (req, res, next) => {
     try {
         const products = await Product.find();
-        res.render('shop/product-list', {prods: products, pageTitle: 'Admin Product', path: '/products', isAuthenticated: req.session.isAuthenticated});
+        res.render('shop/product-list', {prods: products, pageTitle: 'Admin Product', path: '/products'});
     } catch(err) {
         console.error(err)
     }
@@ -14,7 +14,7 @@ exports.getProduct = async (req, res, next) => {
     const prodId = req.params.productId;
     try {
         const product = await Product.findById(prodId);
-        res.render('shop/product-detail', {product: product, pageTitle: 'Product Detail', path: '/products', isAuthenticated: req.session.isAuthenticated});
+        res.render('shop/product-detail', {product: product, pageTitle: 'Product Detail', path: '/products'});
     } catch(err) {
         console.error(err);
     }
@@ -23,7 +23,7 @@ exports.getProduct = async (req, res, next) => {
 exports.getIndex = async (req, res, next) => {
     try {
         const products = await Product.find();
-        res.render('shop/index', {prods: products, pageTitle: 'Admin Product', path: '/', isAuthenticated: req.session.isAuthenticated});
+        res.render('shop/index', {prods: products, pageTitle: 'Admin Product', path: '/'});
     } catch(err) {
         console.error(err)
     }
@@ -33,7 +33,7 @@ exports.getCart = async (req, res, next) => {
     try {
         const user = await req.user.populate('cart.product');
         const cart = user.cart;
-        res.render('shop/cart', {products: cart, pageTitle: 'Cart', path: '/cart', isAuthenticated: req.session.isAuthenticated});
+        res.render('shop/cart', {products: cart, pageTitle: 'Cart', path: '/cart'});
     } catch(err) {
         console.error(err);
     }
@@ -87,12 +87,12 @@ exports.postOrders = async (req, res, next) => {
 exports.getOrders = async (req, res, next) => {
     try {
         const orders = await Order.find({'user.userId': req.user._id});
-        res.render('shop/orders', {orders: orders, pageTitle: 'Orders', path: '/orders', isAuthenticated: req.session.isAuthenticated});
+        res.render('shop/orders', {orders: orders, pageTitle: 'Orders', path: '/orders'});
     } catch(err) {
         console.error(err);
     }
 };
 
 exports.getCheckout = (req, res, next) => {
-    res.render('shop/checkout', {pageTitle: 'Checkout', path: '/checkout', isAuthenticated: req.session.isAuthenticated});
+    res.render('shop/checkout', {pageTitle: 'Checkout', path: '/checkout'});
 };

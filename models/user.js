@@ -10,6 +10,12 @@ const userSchema = new Schema({
         type: String,
         required: true,
     },
+    password: {
+        type: String,
+        required: true,
+    },
+    resetToken: String,
+    resetTokenExpiration: String,
     cart: [{
         product: {
             type: Schema.Types.ObjectId,
@@ -20,7 +26,8 @@ const userSchema = new Schema({
             type: Number,
             required: true,
         }
-    }]
+    }],
+    isAdmin: Boolean,
 });
 
 userSchema.methods.addToCart = function(product) {
