@@ -1,7 +1,7 @@
 const Product = require('../models/product');
 
 exports.getAddProduct = (req, res, next) => {
-    res.render('admin/edit-product', {pageTitle: 'Add Product', path: '/admin/add-product', editing: false, isAuthenticated: req.session.isAuthenticated});
+    res.render('admin/edit-product', {pageTitle: 'Add Product', path: '/admin/add-product', editing: false});
 };
 
 exports.postAddProduct = async (req, res, next) => {
@@ -30,7 +30,7 @@ exports.getEditProduct = async (req, res, next) => {
     try {
         const product = await Product.findById(prodID);
         if(!product) res.redirect('/');
-        res.render('admin/edit-product', { product: product, pageTitle: 'Edit Product', path: 'admin/edit-product', editing: editMode, isAuthenticated: req.session.isAuthenticated});
+        res.render('admin/edit-product', { product: product, pageTitle: 'Edit Product', path: 'admin/edit-product', editing: editMode});
     } catch {
         console.error(err);
     }
@@ -58,7 +58,7 @@ exports.postEditProduct = async (req, res, next) => {
 exports.getProducts = async (req, res, next) => {
     try {
         const products = await Product.find();
-        res.render('admin/products', {prods: products, pageTitle: 'Admin Product', path: '/admin/products', isAuthenticated: req.session.isAuthenticated});
+        res.render('admin/products', {prods: products, pageTitle: 'Admin Product', path: '/admin/products'});
     } catch(err) {
         console.error(err)
     }
