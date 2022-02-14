@@ -2,13 +2,15 @@ const Product = require('../models/product');
 const Order = require('../models/order');
 const User = require('../models/user');
 const AdminRequest = require('../models/adminRequest');
+const show500 = require('../middleware/500');
 
 exports.getProducts = async (req, res, next) => {
     try {
         const products = await Product.find();
         res.render('shop/product-list', {prods: products, pageTitle: 'Admin Product', path: '/products'});
     } catch(err) {
-        console.error(err)
+        show500(err);
+        return next(err);
     }
 };
 
@@ -18,7 +20,8 @@ exports.getProduct = async (req, res, next) => {
         const product = await Product.findById(prodId);
         res.render('shop/product-detail', {product: product, pageTitle: 'Product Detail', path: '/products'});
     } catch(err) {
-        console.error(err);
+        show500(err);
+        return next(err);
     }
 }
 
@@ -27,7 +30,8 @@ exports.getIndex = async (req, res, next) => {
         const products = await Product.find();
         res.render('shop/index', {prods: products, pageTitle: 'Admin Product', path: '/'});
     } catch(err) {
-        console.error(err)
+        show500(err);
+        return next(err);
     }
 };
 
@@ -37,7 +41,8 @@ exports.getCart = async (req, res, next) => {
         const cart = user.cart;
         res.render('shop/cart', {products: cart, pageTitle: 'Cart', path: '/cart'});
     } catch(err) {
-        console.error(err);
+        show500(err);
+        return next(err);
     }
 };
 
@@ -48,7 +53,8 @@ exports.postCart = async (req, res, next) => {
         await req.user.addToCart(product)
         res.redirect('/cart')
     } catch(err) {
-        console.error(err);
+        show500(err);
+        return next(err);
     }
 };
 
@@ -58,7 +64,8 @@ exports.postDeleteCartItem = async (req, res, next) => {
         await req.user.removeCartItem(prodId);
         res.redirect('/cart');
     } catch(err) {
-        console.error(err);
+        show500(err);
+        return next(err);
     }
 }
 
@@ -82,7 +89,8 @@ exports.postOrders = async (req, res, next) => {
         await req.user.clearCart();
         res.redirect('/orders');
     } catch(err) {
-        console.error(err);
+        show500(err);
+        return next(err);
     }
 }
 
@@ -91,7 +99,8 @@ exports.getOrders = async (req, res, next) => {
         const orders = await Order.find({'user.userId': req.user._id});
         res.render('shop/orders', {orders: orders, pageTitle: 'Orders', path: '/orders'});
     } catch(err) {
-        console.error(err);
+        show500(err);
+        return next(err);
     }
 };
 
@@ -128,6 +137,7 @@ exports.postRequestAdmin = async (req, res, next) => {
         req.flash('message', 'Request Submitted Successfully')
         res.redirect('/request-admin');
     } catch(err) {
-        console.error(err);
+        show500(err);
+        return next(err);
     }
 };

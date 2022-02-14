@@ -2,6 +2,7 @@ const Product = require('../models/product');
 const AdminRequest = require('../models/adminRequest');
 const User = require('../models/user');
 const { validationResult } = require('express-validator');
+const show500 = require('../middleware/500');
 
 exports.getAddProduct = (req, res, next) => {
     res.render('admin/edit-product', {
@@ -44,18 +45,23 @@ exports.postAddProduct = async (req, res, next) => {
         res.redirect('/');
     } catch(err) {
         console.error(err);
-        return res.status(422).render('admin/edit-product', {
-            pageTitle: 'Add Product',
-            path: '/admin/add-product',
-            editing: false,
-            errorMessage: err.errors['price'].message,
-            oldValues: {
-                title: title,
-                imageUrl: imageUrl,
-                price: price,
-                description: description,
-            }
-        })
+        if (err.errors) {
+            return res.status(422).render('admin/edit-product', {
+                pageTitle: 'Add Product',
+                path: '/admin/add-product',
+                editing: false,
+                errorMessage: err.errors['price'].message,
+                oldValues: {
+                    title: title,
+                    imageUrl: imageUrl,
+                    price: price,
+                    description: description,
+                }
+            })
+        } else {
+            show500(err);
+            return next(err);
+        }
     }
 };
 
@@ -67,8 +73,9 @@ exports.getEditProduct = async (req, res, next) => {
         const product = await Product.findById(prodID);
         if(!product) res.redirect('/');
         res.render('admin/edit-product', { product: product, pageTitle: 'Edit Product', path: 'admin/edit-product', editing: editMode, errorMessage: [], oldValues: {}});
-    } catch {
-        console.error(err);
+    } catch(err) {
+        show500(err);
+        return next(err);
     }
 }
 
@@ -123,7 +130,7 @@ exports.getProducts = async (req, res, next) => {
         const products = await Product.find();
         res.render('admin/products', {prods: products, pageTitle: 'Admin Product', path: '/admin/products'});
     } catch(err) {
-        console.error(err)
+        show500(err)
     }
 };
 
@@ -133,7 +140,8 @@ exports.postDeleteProduct = async (req, res, next) => {
         await Product.findByIdAndDelete(id);
         res.redirect('/');
     } catch {
-        console.error(err);
+        show500(err);
+        return next(err);
     }
 };
 
@@ -147,7 +155,9 @@ exports.getAdminRequest = (req, res, next) => {
             approved: req.flash('approved'),
         })
     })
-    .catch(err => console.error(err))
+    .catch(err => {
+        next(new Error(err));
+    })
 };
 
 exports.postAdminRequest = (req, res, next) => {
@@ -168,5 +178,7 @@ exports.postAdminRequest = (req, res, next) => {
         req.flash('approved', 'Admin Access Approved Successfully');
         res.redirect('/admin/requests')
     })
-    .catch(err => console.error(err));
+    .catch(err => {
+        next(new Error(err));
+    });
 };

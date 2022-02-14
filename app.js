@@ -73,7 +73,12 @@ app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
 
+app.get('/500', errorController.get500);
 app.use('*', errorController.get404);
+
+app.use((error, req, res, next) => {
+    res.redirect('/500');
+})
 
 const dbUrI = process.env.URI;
 mongoose.connect(dbUrI);
