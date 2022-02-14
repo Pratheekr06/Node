@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const adminSchema = new Schema({
+const adminReqSchema = new Schema({
     name: {
         type: String,
         required: true,
@@ -10,10 +10,14 @@ const adminSchema = new Schema({
         type: String,
         required: true,
     },
-    password: {
+    adminAccessRequest: {
         type: String,
-        required: true,
+        default: 'off',
+    },
+    isAdmin: {
+        type: Boolean,
+        default: false,
     },
 });
 
-module.exports = mongoose.model('Admin', adminSchema);
+module.exports = mongoose.model('AdminReqs', adminReqSchema);

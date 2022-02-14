@@ -16,6 +16,8 @@
                 <li class="main-header__item">
                     <a class="<%= path === '/orders' ? 'active' : '' %>" href="/orders">Orders</a>
                 </li>
+            <% } %>
+            <% if (isAdmin) { %>
                 <li class="main-header__item">
                     <a class="<%= path === '/admin/add-product' ? 'active' : '' %>" href="/admin/add-product">Add Product
                     </a>
@@ -34,7 +36,20 @@
                 <li class="main-header__item">
                     <a class="<%= path === '/signup' ? 'active' : '' %>" href="/signup">Signup</a>
                 </li>
+            <% } else if(isAdmin) { %>
+                <li class="main-header__item">
+                    <a class="<%= path === '/admin/requests' ? 'active' : '' %>" href="/admin/requests">Admin Requests</a>
+                </li>
+                <li class="main-header__item">
+                    <form action="/logout" method="post" class="main-header__item">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <button type="submit">Logout</button>
+                    </form>
+                </li>
             <% } else { %>
+                <li class="main-header__item">
+                    <a class="<%= path === '/request-admin' ? 'active' : '' %>" href="/request-admin">Request Admin Access</a>
+                </li>
                 <li class="main-header__item">
                     <form action="/logout" method="post" class="main-header__item">
                         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
@@ -61,6 +76,8 @@
             <li class="mobile-nav__item">
                 <a class="<%= path === '/orders' ? 'active' : '' %>" href="/orders">Orders</a>
             </li>
+        <% } %>
+        <% if (isAdmin) { %>
             <li class="mobile-nav__item">
                 <a class="<%= path === '/admin/add-product' ? 'active' : '' %>" href="/admin/add-product">Add Product
                 </a>
@@ -77,7 +94,20 @@
             <li class="mobile-nav__item">
                 <a class="<%= path === '/signup' ? 'active' : '' %>" href="/signup">Signup</a>
             </li>
+        <% } else if(isAdmin) { %>
+            <li class="mobile-nav__item">
+                <a class="<%= path === '/admin/requests' ? 'active' : '' %>" href="/admin/requests">Admin Requests</a>
+            </li>
+            <li class="mobile-nav__item">
+                <form action="/logout" method="post" class="main-header__item">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <button type="submit">Logout</button>
+                </form>
+            </li>
         <% } else { %>
+            <li class="mobile-nav__item">
+                <a class="<%= path === '/request-admin' ? 'active' : '' %>" href="/request-admin">Requests Admin Access</a>
+            </li>
             <li class="mobile-nav__item">
                 <form action="/logout" method="post">
                     <input type="hidden" name="_csrf" value="<%= csrfToken %>">

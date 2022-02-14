@@ -13,10 +13,13 @@ const productSchema = new Schema({
     price: {
         type: Number,
         required: true,
+        min: [1, 'Price must be more than 0'],
     },
     description: {
         type: String,
         required: true,
+        //minlength: [5, 'Description should be atleat 3 characters long'],
+        
     },
 },
     {

@@ -1,8 +1,9 @@
 const User = require('../models/user');
+const AdminRequests = require('../models/adminRequest');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
-const user = require('../models/user');
+const { validationResult } = require('express-validator')
 
 const transport = nodemailer.createTransport({
     host: "smtp.mailtrap.io",
@@ -17,17 +18,30 @@ exports.getLogin = (req, res, next) => {
     res.render('auth/login', {
         pageTitle: 'Login',
         path: '/login',
-        errorMessage: req.flash('error')
+        errorMessage: req.flash('error'),
+        oldValues: {}
     });
 };
 
 exports.postLogin = async (req, res, next) => {
     const email = req.body.email;
     const password = req.body.password;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).render('auth/login', {
+            path: '/login',
+            pageTitle: 'Login',
+            errorMessage: errors.array()[0].msg,
+            oldValues: {
+                email: email,
+                password: password
+            },
+          });
+    }
     try {
-        const user = await User.findOne({ email });
+        const user = await User.findOne({email});
         if (!user) {
-            req.flash('error', 'Invalid Email')
+            req.flash('error', 'Invalid email id');
             return res.redirect('/login');
         }
         bcrypt.compare(password, user.password)
@@ -35,6 +49,7 @@ exports.postLogin = async (req, res, next) => {
                 if (isMatch) {
                     req.session.userId = user._id;
                     req.session.isAuthenticated = true;
+                    req.session.isAdmin = user.isAdmin;
                     return req.session.save(err => {
                         if (err) throw err;
                         res.redirect('/');
@@ -62,6 +77,8 @@ exports.getSignup = (req, res, next) => {
     res.render('auth/signup', {
       path: '/signup',
       pageTitle: 'Signup',
+      errorMessage: req.flash('error'),
+      oldValues: {}
     });
   };
 
@@ -69,6 +86,8 @@ exports.postSignup = async (req, res, next) => {
     const name = req.body.name;
     const email = req.body.email;
     const password = req.body.password;
+    const adminAccessRequest = req.body.adminAccessRequest;
+    const errors = validationResult(req);
     // User.findOne({ email })
     //     .then(user => {
     //         if (user) {
@@ -88,28 +107,43 @@ exports.postSignup = async (req, res, next) => {
     //         res.redirect('/');
     //     })
     //     .catch(err => console.error(err))
-    try {
-        const user = await User.findOne({email});
-        if (user) {
-            req.flash('error', 'User already exist, Please Login');
-            res.redirect('/login');
-        }
-        else {
-            const hashedPassword = await bcrypt.hash(password, 12)
-            const userDoc = User({
+    if (!errors.isEmpty()) {
+        return res.status(422).render('auth/signup', {
+            path: '/signup',
+            pageTitle: 'Signup',
+            errorMessage: errors.array()[0].msg,
+            oldValues: {
                 name: name,
                 email: email,
-                password: hashedPassword
+                password: password,
+                adminAccessRequest: adminAccessRequest
+            }
+          });
+    }
+    try {
+        const hashedPassword = await bcrypt.hash(password, 12);
+        const userDoc = User({
+            name: name,
+            email: email,
+            password: hashedPassword,
+            adminAccessRequest: adminAccessRequest || 'off',
+        });
+        await userDoc.save();
+        if (adminAccessRequest === 'on') {
+            const adminReqs = AdminRequests({
+                name,
+                email,
+                adminAccessRequest,
             });
-            await userDoc.save();
-            res.redirect('/login')
-            transport.sendMail({
-                to: email,
-                from: 'shop@node.com',
-                subject: 'Sigup Successful!!',
-                html: '<h1>Thank you for Signing Up</h1>'
-            })
+            await adminReqs.save();
         }
+        res.redirect('/login')
+        transport.sendMail({
+            to: email,
+            from: 'shop@node.com',
+            subject: 'Sigup Successful!!',
+            html: '<h1>Thank you for Signing Up</h1>'
+        })
     } catch(err) {
         console.error(err);
     }

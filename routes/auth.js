@@ -3,15 +3,18 @@ const path = require('path');
 const express = require('express');
 const router = express.Router();
 
+const { check, body } = require('express-validator');
+const userValidation = require('../validation/userValidation');
+
 const authController = require('../controllers/auth');
 
 router.get('/login', authController.getLogin);
 
 router.get('/signup', authController.getSignup);
 
-router.post('/login', authController.postLogin);
+router.post('/login', userValidation.loginValidation, authController.postLogin);
 
-router.post('/signup', authController.postSignup);
+router.post('/signup', userValidation.signupValidation, authController.postSignup);
 
 router.post('/logout', authController.postLogout);
 
