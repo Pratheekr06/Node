@@ -1,5 +1,7 @@
 const Product = require('../models/product');
 const Order = require('../models/order');
+const User = require('../models/user');
+const AdminRequest = require('../models/adminRequest');
 
 exports.getProducts = async (req, res, next) => {
     try {
@@ -95,4 +97,37 @@ exports.getOrders = async (req, res, next) => {
 
 exports.getCheckout = (req, res, next) => {
     res.render('shop/checkout', {pageTitle: 'Checkout', path: '/checkout'});
+};
+
+exports.getRequestAdmin = (req, res, next) => {
+    res.render('admin/request-admin', {
+        pageTitle: 'Request Admin',
+        path: '/request-admin',
+        userDetail: {
+            name: req.user.name,
+            email: req.user.email,
+        },
+        message: req.flash('message'),
+        adminAccessRequest: req.user.adminAccessRequest,
+    });
+};
+
+exports.postRequestAdmin = async (req, res, next) => {
+    try {
+        const user = await User.findOne({email: req.user.email});
+        user.adminAccessRequest = 'on';
+        await user.save();
+        const request = new AdminRequest({
+            name: req.user.name,
+            email: req.user.email,
+            adminAccessRequest: 'on',
+            isAdmin: false,
+        });
+        await request.save();
+        res.locals.adminAccessRequest = 'on';
+        req.flash('message', 'Request Submitted Successfully')
+        res.redirect('/request-admin');
+    } catch(err) {
+        console.error(err);
+    }
 };

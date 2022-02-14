@@ -1,5 +1,6 @@
 .form-control {
     margin: 1rem 0;
+    position: relative;
 }
 
 .form-control label,
@@ -21,3 +22,17 @@
 .form-control textarea:focus {
     outline-color: #00695c;
 }
+
+.toggle-password {
+    position: absolute;
+    color: rgb(56, 56, 133);
+    left: 20.4em;
+    cursor: pointer;
+}
+
+#adminAccessRequest {
+    transform: scale(1.5);
+    width: auto;
+    cursor: pointer;
+}
+

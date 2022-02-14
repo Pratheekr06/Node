@@ -238,9 +238,8 @@ form {
 }
 
 .user-message-error {
-  border-color: red;
-  background: rgb(248, 152, 152);
-  color: red;
+  border-color: black;
+  background: brown;
 }
 
 @media (min-width: 768px) {

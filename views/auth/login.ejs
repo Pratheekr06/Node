@@ -10,14 +10,15 @@
         <% if (errorMessage.length > 0) { %>
             <div class="user-message user-message-error"><%= errorMessage %></div>
         <% } %>
-        <form class="login-form" action="/login" method="POST">
+        <form class="login-form" action="/login" method="POST" novalidate>
             <div class="form-control">
                 <label for="email">E-Mail</label>
-                <input type="email" name="email" id="email">
+                <input type="email" name="email" id="email" value="<%= oldValues ? oldValues.email : '' %>">
             </div>
             <div class="form-control">
                 <label for="password">Password</label>
-                <input type="password" name="password" id="password">
+                <span class="toggle-password" id="toggle-password">Show</span>
+                <input type="password" name="password" id="password" value="<%= oldValues ? oldValues.password : '' %>">
             </div>
             <input type="hidden" name="_csrf" value="<%= csrfToken %>">
             <button class="btn" type="submit">Login</button>

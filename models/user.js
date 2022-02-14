@@ -27,7 +27,11 @@ const userSchema = new Schema({
             required: true,
         }
     }],
-    isAdmin: Boolean,
+    adminAccessRequest: String,
+    isAdmin: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 userSchema.methods.addToCart = function(product) {

@@ -7,6 +7,6 @@ exports.isAuth = (req, res, next) => {
 };
 
 exports.isAdmin = (req, res, next) => {
-    if (!req.session.isAdmin) return res.redirect('/login');
+    if (!req.session.isAuthenticated || !req.session.isAdmin) return res.redirect('/request-access');
     next();
 }
