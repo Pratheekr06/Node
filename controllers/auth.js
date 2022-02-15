@@ -3,7 +3,8 @@ const AdminRequests = require('../models/adminRequest');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
-const { validationResult } = require('express-validator')
+const { validationResult } = require('express-validator');
+const show500 = require('../middleware/500');
 
 const transport = nodemailer.createTransport({
     host: "smtp.mailtrap.io",
@@ -60,15 +61,17 @@ exports.postLogin = async (req, res, next) => {
                     return res.redirect('/login');
                 }
             })
-            .catch(err => console.error(err))
+            .catch(err => {
+                next(new Error(err))
+            })
     } catch(err) {
-        console.error(err);
+        next(new Error(err))
     }
 }
 
 exports.postLogout = (req, res, next) => {
     req.session.destroy((err) => {
-        if (err) console.error(err);
+        if (err) show500(err);
         res.redirect('/');
     });
 }
@@ -145,7 +148,8 @@ exports.postSignup = async (req, res, next) => {
             html: '<h1>Thank you for Signing Up</h1>'
         })
     } catch(err) {
-        console.error(err);
+        show500(err);
+        return next(err);
     }
 };
 
@@ -182,9 +186,13 @@ exports.postReset = (req, res, next) => {
                         `
                     })
                 })
-                .catch(err => console.error(err));
+                .catch(err => {
+                    next(new Error(err))
+                });
             })
-            .catch(err => console.error(err));
+            .catch(err =>{
+                next(new Error(err))
+            });
     })
 }
 
@@ -199,8 +207,9 @@ exports.getNewPassword = async (req, res, next) => {
             userId: user ? user._id.toString() : '',
             passwordToken: token,
         })
-    } catch (err) {
-        console.error(err);
+    } catch(err) {
+        show500(err);
+        return next(err);
     }
 }
 
@@ -225,6 +234,7 @@ exports.postNewPassword = async (req, res, next) => {
         await user.save();
         res.redirect('/login');
     } catch(err) {
-        console.error(err);
+        show500(err);
+        return next(err);
     }
 }
