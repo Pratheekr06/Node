@@ -6,12 +6,25 @@ const show500 = require('../middleware/500');
 const fs = require('fs');
 const path = require('path');
 const PDFDocument = require('pdfkit');
-const { text } = require('pdfkit');
+
+const ITEMS_PER_PAGE = 3;
 
 exports.getProducts = async (req, res, next) => {
+    const page = +req.query.page || 1;
     try {
-        const products = await Product.find();
-        res.render('shop/product-list', {prods: products, pageTitle: 'Products', path: '/products'});
+        const totalProducts = await Product.countDocuments();
+        const products = await Product.find().skip((page-1) * ITEMS_PER_PAGE).limit(ITEMS_PER_PAGE);
+        res.render('shop/product-list', {
+            prods: products,
+            pageTitle: 'Products',
+            path: '/products',
+            currentPage: page,
+            hasNextPage: ITEMS_PER_PAGE * page < totalProducts,
+            hasPreviousPage: page > 1,
+            nextPage: page + 1,
+            previousPage: page - 1,
+            lastPage: Math.ceil(totalProducts / ITEMS_PER_PAGE),
+        });
     } catch(err) {
         show500(err);
         return next(err);
@@ -30,9 +43,21 @@ exports.getProduct = async (req, res, next) => {
 }
 
 exports.getIndex = async (req, res, next) => {
+    const page = +req.query.page || 1;
     try {
-        const products = await Product.find();
-        res.render('shop/index', {prods: products, pageTitle: 'Shop', path: '/'});
+        const totalProducts = await Product.countDocuments();
+        const products = await Product.find().skip((page-1) * ITEMS_PER_PAGE).limit(ITEMS_PER_PAGE);
+        res.render('shop/index', {
+            prods: products,
+            pageTitle: 'Shop',
+            path: '/',
+            currentPage: page,
+            hasNextPage: ITEMS_PER_PAGE * page < totalProducts,
+            hasPreviousPage: page > 1,
+            nextPage: page + 1,
+            previousPage: page - 1,
+            lastPage: Math.ceil(totalProducts / ITEMS_PER_PAGE),
+        });
     } catch(err) {
         show500(err);
         return next(err);

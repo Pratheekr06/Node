@@ -5,6 +5,8 @@ const { validationResult } = require('express-validator');
 const show500 = require('../middleware/500');
 const fileHelper = require('../util/fileHelper');
 
+const ITEMS_PER_PAGE = 1;
+
 exports.getAddProduct = (req, res, next) => {
     res.render('admin/edit-product', {
         pageTitle: 'Add Product',
@@ -139,9 +141,21 @@ exports.postEditProduct = async (req, res, next) => {
 }
 
 exports.getProducts = async (req, res, next) => {
+    const page = +req.query.page || 1;
     try {
-        const products = await Product.find();
-        res.render('admin/products', {prods: products, pageTitle: 'Admin Product', path: '/admin/products'});
+        const totalProducts = await Product.find().countDocuments();
+        const products = await Product.find().skip((page - 1) * ITEMS_PER_PAGE).limit(ITEMS_PER_PAGE);
+        res.render('admin/products', {
+            prods: products,
+            pageTitle: 'Admin Product',
+            path: '/admin/products',
+            currentPage: page,
+            hasNextPage: ITEMS_PER_PAGE * page < totalProducts,
+            hasPreviousPage: page > 1,
+            nextPage: page + 1,
+            previousPage: page - 1,
+            lastPage: Math.ceil(totalProducts / ITEMS_PER_PAGE),
+        });
     } catch(err) {
         show500(err)
     }
