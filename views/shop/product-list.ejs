@@ -3,7 +3,7 @@
 </head>
 
 <body>
-    <%- await include('../includes/navigation.ejs') %>
+    <%- include('../includes/navigation.ejs') %>
 
     <main>
         <% if (prods.length > 0) { %>
@@ -14,7 +14,7 @@
                             <h1 class="product__title"><%= product.title %></h1>
                         </header>
                         <div class="card__image">
-                            <img src="<%= product.imageUrl %>" alt="<%= product.imageUrl %>">
+                            <img src="/<%= product.image %>" alt="<%= product.image %>">
                         </div>
                         <div class="card__content">
                             <h2 class="product__price">$<%= product.price %></h2>

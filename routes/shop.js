@@ -29,4 +29,6 @@ router.get('/request-admin', auth.isAuth, shopController.getRequestAdmin);
 
 router.post('/request-admin', auth.isAuth, shopController.postRequestAdmin);
 
+router.get('/orders/:orderId', auth.isAuth, shopController.getInvoice);
+
 module.exports = router;

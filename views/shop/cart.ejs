@@ -10,7 +10,14 @@
                     <% products.forEach(p => { %>
                         <li class="cart__item">
                             <h1><%= p.product.title %></h1>
-                            <h2>Quantity: <%= p.quantity %></h2>
+                            <h2 style="display: flex;">
+                                Quantity: <%= p.quantity %>
+                                <form id="cartForm" action="/cart" method="post" style="padding: unset; display: inline;">
+                                    <i onclick="document.getElementById('cartForm').submit()" class="fa fa-plus-square" style="color: #00695c; padding-left: 0.5em; font-size: larger; cursor: pointer;"></i>
+                                    <input type="hidden" name="productId" value="<%= p.product._id %>">
+                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                </form>
+                            </h2>
                             <form action="/cart-delete-item" method="POST">
                                 <input type="hidden" value="<%= p.product._id %>" name="productId">
                                 <input type="hidden" name="_csrf" value="<%= csrfToken %>">

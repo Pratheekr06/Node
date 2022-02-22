@@ -3,6 +3,7 @@ const AdminRequest = require('../models/adminRequest');
 const User = require('../models/user');
 const { validationResult } = require('express-validator');
 const show500 = require('../middleware/500');
+const fileHelper = require('../util/fileHelper');
 
 exports.getAddProduct = (req, res, next) => {
     res.render('admin/edit-product', {
@@ -16,7 +17,7 @@ exports.getAddProduct = (req, res, next) => {
 
 exports.postAddProduct = async (req, res, next) => {
     const title = req.body.title;
-    const imageUrl = req.body.imageUrl;
+    const image = req.file.path;
     const price = req.body.price;
     const description = req.body.description;
     const errors = validationResult(req);
@@ -29,7 +30,7 @@ exports.postAddProduct = async (req, res, next) => {
                 errorMessage: errors.array()[0].msg,
                 oldValues: {
                     title: title,
-                    imageUrl: imageUrl,
+                    image: image,
                     price: price,
                     description: description,
                 }
@@ -37,7 +38,7 @@ exports.postAddProduct = async (req, res, next) => {
         }
         const product = new Product({
             title,
-            imageUrl,
+            image,
             price,
             description,
         })
@@ -53,7 +54,7 @@ exports.postAddProduct = async (req, res, next) => {
                 errorMessage: err.errors['price'].message,
                 oldValues: {
                     title: title,
-                    imageUrl: imageUrl,
+                    image: image,
                     price: price,
                     description: description,
                 }
@@ -81,15 +82,15 @@ exports.getEditProduct = async (req, res, next) => {
 
 exports.postEditProduct = async (req, res, next) => {
     const title = req.body.title;
-    const imageUrl = req.body.imageUrl;
+    const image = req.file;
     const price = req.body.price;
     const description = req.body.description;
-    const updatedProduct = {
-        title: title,
-        imageUrl: imageUrl,
-        price: price,
-        description: description
-    }
+    // const updatedProduct = {
+    //     title: title,
+    //     image: image.path,
+    //     price: price,
+    //     description: description
+    // }
     const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(422).render('admin/edit-product', {
@@ -99,29 +100,41 @@ exports.postEditProduct = async (req, res, next) => {
                 errorMessage: errors.array()[0].msg,
                 oldValues: {
                     title: title,
-                    imageUrl: imageUrl,
+                    image: image,
                     price: price,
                     description: description,
                 }
             })
         }
     try {
-        await Product.findByIdAndUpdate(req.body.productId, updatedProduct, { new: true });
+        //await Product.findByIdAndUpdate(req.body.productId, updatedProduct, { new: true });
+        const product = await Product.findById(req.body.productId);
+        product.title = title;
+        product.price = price;
+        product.description = description;
+        if (product.image) fileHelper.deleteFile(product.image);
+        product.image = image.path;
+        await product.save();
         res.redirect('/');
     } catch(err) {
         console.error(err);
-        return res.status(422).render('admin/edit-product', {
-            pageTitle: 'Edit Product',
-            path: '/admin/add-product',
-            editing: false,
-            errorMessage: err.errors['price'].message,
-            oldValues: {
-                title: title,
-                imageUrl: imageUrl,
-                price: price,
-                description: description,
-            }
-        })
+        if (err.errors) {
+            return res.status(422).render('admin/edit-product', {
+                pageTitle: 'Edit Product',
+                path: '/admin/add-product',
+                editing: false,
+                errorMessage: err.errors['price'].message,
+                oldValues: {
+                    title: title,
+                    image: image,
+                    price: price,
+                    description: description,
+                }
+            })
+        } else {
+            show500(err);
+            return next(err);
+        }
     }
 }
 
@@ -137,9 +150,11 @@ exports.getProducts = async (req, res, next) => {
 exports.postDeleteProduct = async (req, res, next) => {
     const id = req.body.productId;
     try {
+        const product = await Product.findById(id);
+        if (product.image) fileHelper.deleteFile(product.image);
         await Product.findByIdAndDelete(id);
         res.redirect('/');
-    } catch {
+    } catch(err) {
         show500(err);
         return next(err);
     }
