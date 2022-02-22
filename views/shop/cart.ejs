@@ -13,7 +13,11 @@
                             <h2 style="display: flex;">
                                 Quantity: <%= p.quantity %>
                                 <form id="cartForm" action="/cart" method="post" style="padding: unset; display: inline;">
-                                    <i onclick="document.getElementById('cartForm').submit()" class="fa fa-plus-square" style="color: #00695c; padding-left: 0.5em; font-size: larger; cursor: pointer;"></i>
+                                    <i
+                                        onclick="document.getElementById('cartForm').submit()"
+                                        class="fa fa-plus-square"
+                                        style="color: #00695c; padding-left: 0.5em; font-size: larger; cursor: pointer;">
+                                    </i>
                                     <input type="hidden" name="productId" value="<%= p.product._id %>">
                                     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                 </form>

@@ -43,6 +43,12 @@ exports.getCart = async (req, res, next) => {
     try {
         const user = await req.user.populate('cart.product');
         const cart = user.cart;
+        cart.forEach((cartItem,i) => {
+            if (!cartItem.product) {
+                cart.splice(i, 1)
+            }
+        });
+        await User.findByIdAndUpdate(req.user._id, { $set: { cart: cart} });
         res.render('shop/cart', {products: cart, pageTitle: 'Cart', path: '/cart'});
     } catch(err) {
         show500(err);
