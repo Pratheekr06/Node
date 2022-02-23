@@ -167,10 +167,9 @@ exports.postDeleteProduct = async (req, res, next) => {
         const product = await Product.findById(id);
         if (product.image) fileHelper.deleteFile(product.image);
         await Product.findByIdAndDelete(id);
-        res.redirect('/');
+        res.status(200).json({ message: 'Success!' });
     } catch(err) {
-        show500(err);
-        return next(err);
+        res.status(500).json({ message: 'Deleting product failed.' });
     }
 };
 

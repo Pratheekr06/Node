@@ -26,4 +26,6 @@ router.get('/requests', auth.isAdmin, adminController.getAdminRequest);
 
 router.post('/requests', auth.isAdmin, adminController.postAdminRequest);
 
+router.delete('/product/:productId', isAuth, adminController.deleteProduct);
+
 module.exports = router;
